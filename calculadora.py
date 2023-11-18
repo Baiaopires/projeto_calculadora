@@ -1,10 +1,13 @@
-from tkinter import *
+import tkinter as tk
 import math
 
-win = Tk()
+win = tk.Tk()
 win.geometry("388x359")
-win.resizable(0, 0)
+win.resizable(1, 0)
 win.title("Calculadora")
+win.configure(bg = "#303030")
+
+list_of_operators = ["/", "*", "+", "-"]
 
 def btn_click(item):
     global expression
@@ -24,7 +27,7 @@ def btn_click(item):
                 if bool_value == 0:
                     expression = expression + "0."
     elif expression == "":
-        if item in {"/", "*", "+", "-"}:
+        if item in list_of_operators:
             expression = "0" + str(item)
         elif item == ")": expression = expression
         else: expression = expression + str(item)
@@ -32,9 +35,12 @@ def btn_click(item):
     elif expression == "0":
         if item == 0: expression = "0"
 
-    elif expression[-1] == "." and item in {"/", "*", "+", "-"}:
+    elif expression[-1] == "." and item in list_of_operators:
         expression = expression + "0" + str(item)
     
+    elif expression[-1] in list_of_operators and item in list_of_operators:
+        expression = expression[:-1] + str(item)
+
     else:
         expression = expression + str(item)
 
@@ -105,84 +111,177 @@ def btn_backspace():
     global expression
 
     expression = expression[:-1]
-    input_text.set(expression)
 
+    if expression == "":
+        input_text.set("0")
+    else:
+        input_text.set(expression)
+
+def on_enter_symbols(e):
+    e.widget['background'] = "#505050"
+
+def on_leave_symbols(e):
+    e.widget['background'] = "#404040"
+
+def on_enter_numbers(e):
+    e.widget['background'] = "#404040"
+
+def on_leave_numbers(e):
+    e.widget['background'] = "#505050"
+
+def on_enter_equal(e):
+    e.widget['background'] = "#FF4247"
+
+def on_leave_equal(e):
+    e.widget['background'] = "#FF686B"
  
 expression = ""
 error = 0
-input_text = StringVar()
+input_text = tk.StringVar()
 input_text.set("0")
  
-input_frame = Frame(win, width=12, height=50, bd=0, highlightbackground="black", highlightcolor="black", highlightthickness=0, relief=GROOVE)
+input_frame = tk.Frame(win, width=12, height=50, bd=0, highlightbackground="black", highlightcolor="black", highlightthickness=0)
  
-input_frame.pack(side=TOP)
+input_frame.pack(side=tk.TOP)
  
-input_field = Entry(input_frame, fg = "white", font=('arial', 20, 'bold'), textvariable=input_text, width=50, bg="#303030", bd=5, relief=FLAT, justify=RIGHT)
+input_field = tk.Entry(input_frame, fg = "white", font=('arial', 20, 'bold'), textvariable=input_text, width=50, bg="#303030", bd=5, relief=tk.FLAT, justify=tk.RIGHT)
  
 input_field.grid(row=0, column=0)
  
 input_field.pack(ipady=10)
  
-btns_frame = Frame(win, width=312, height=272.5, bg="#303030")
- 
+btns_frame = tk.Frame(win, width=312, height=272.5, bg="#303030")
+
 btns_frame.pack()
 
 #primeira linha
  
-clear = Button(btns_frame, text = "C", fg = "white", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "hand2", command = lambda: bt_clear()).grid(row = 0, column = 0, padx = 1, pady = 1)
+clear = tk.Button(btns_frame, text = "C", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: bt_clear())
+clear.grid(row = 0, column = 0, padx = 1, pady = 1)
+clear.bind("<Enter>", on_enter_symbols) 
+clear.bind("<Leave>", on_leave_symbols)
 
-left_parenthesis = Button(btns_frame, text = "(", fg = "white", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "hand2", command = lambda: btn_click("(")).grid(row = 0, column = 1, padx = 1, pady = 1)
+left_parenthesis = tk.Button(btns_frame, text = "(", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_click("("))
+left_parenthesis.grid(row = 0, column = 1, padx = 1, pady = 1)
+left_parenthesis.bind("<Enter>", on_enter_symbols) 
+left_parenthesis.bind("<Leave>", on_leave_symbols)
 
-right_parenthesis = Button(btns_frame, text = ")", fg = "white", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "hand2", command = lambda: btn_click(")")).grid(row = 0, column = 2, padx = 1, pady = 1)
- 
-divide = Button(btns_frame, text = "/", fg = "white", highlightcolor="#505050", highlightbackground="#505050", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "hand2", command = lambda: btn_click("/")).grid(row = 0, column = 3, padx = 1, pady = 1)
+right_parenthesis = tk.Button(btns_frame, text = ")", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_click(")"))
+right_parenthesis.grid(row = 0, column = 2, padx = 1, pady = 1)
+right_parenthesis.bind("<Enter>", on_enter_symbols) 
+right_parenthesis.bind("<Leave>", on_leave_symbols)
 
-backspace = Button(btns_frame, text = "⌫", fg = "white", highlightcolor="#505050", highlightbackground="#505050", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "hand2", command = lambda: btn_backspace()).grid(row = 0, column = 4, padx = 1, pady = 1)
- 
+divide = tk.Button(btns_frame, text = "÷", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_click("/"))
+divide.grid(row = 0, column = 3, padx = 1, pady = 1)
+divide.bind("<Enter>", on_enter_symbols) 
+divide.bind("<Leave>", on_leave_symbols)
+
+backspace = tk.Button(btns_frame, text = "⌫", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_backspace())
+backspace.grid(row = 0, column = 4, padx = 1, pady = 1)
+backspace.bind("<Enter>", on_enter_symbols) 
+backspace.bind("<Leave>", on_leave_symbols)
+
 #segunda linha
  
-seven = Button(btns_frame, text = "7", fg = "white", highlightcolor="#505050", highlightbackground="#505050", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "hand2", command = lambda: btn_click(7)).grid(row = 1, column = 0, padx = 1, pady = 1)
- 
-eight = Button(btns_frame, text = "8", fg = "white", highlightcolor="#505050", highlightbackground="#505050", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "hand2", command = lambda: btn_click(8)).grid(row = 1, column = 1, padx = 1, pady = 1)
- 
-nine = Button(btns_frame, text = "9", fg = "white", highlightcolor="#505050", highlightbackground="#505050", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "hand2", command = lambda: btn_click(9)).grid(row = 1, column = 2, padx = 1, pady = 1)
- 
-multiply = Button(btns_frame, text = "*", fg = "white", highlightcolor="#505050", highlightbackground="#505050", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "hand2", command = lambda: btn_click("*")).grid(row = 1, column = 3, padx = 1, pady = 1)
+seven = tk.Button(btns_frame, text = "7", fg = "white", activebackground="#353535", activeforeground="#909090", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "arrow", command = lambda: btn_click(7))
+seven.grid(row = 1, column = 0, padx = 1, pady = 1)
+seven.bind("<Enter>", on_enter_numbers) 
+seven.bind("<Leave>", on_leave_numbers) 
 
-cossine = Button(btns_frame, text = "cos", fg = "white", highlightcolor="#505050", highlightbackground="#505050", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "hand2", command = lambda: btn_click("cos(")).grid(row = 1, column = 4, padx = 1, pady = 1)
- 
+eight = tk.Button(btns_frame, text = "8", fg = "white", activebackground="#353535", activeforeground="#909090", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "arrow", command = lambda: btn_click(8))
+eight.grid(row = 1, column = 1, padx = 1, pady = 1)
+eight.bind("<Enter>", on_enter_numbers) 
+eight.bind("<Leave>", on_leave_numbers) 
+
+nine = tk.Button(btns_frame, text = "9", fg = "white", activebackground="#353535", activeforeground="#909090", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "arrow", command = lambda: btn_click(9))
+nine.grid(row = 1, column = 2, padx = 1, pady = 1)
+nine.bind("<Enter>", on_enter_numbers) 
+nine.bind("<Leave>", on_leave_numbers) 
+
+multiply = tk.Button(btns_frame, text = "×", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_click("*")) 
+multiply.grid(row = 1, column = 3, padx = 1, pady = 1)
+multiply.bind("<Enter>", on_enter_symbols) 
+multiply.bind("<Leave>", on_leave_symbols)
+
+cossine = tk.Button(btns_frame, text = "cos", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_click("cos(")) 
+cossine.grid(row = 1, column = 4, padx = 1, pady = 1)
+cossine.bind("<Enter>", on_enter_symbols) 
+cossine.bind("<Leave>", on_leave_symbols)
+
 # terceira linha
  
-four = Button(btns_frame, text = "4", fg = "white", highlightcolor="#505050", highlightbackground="#505050", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "hand2", command = lambda: btn_click(4)).grid(row = 2, column = 0, padx = 1, pady = 1)
- 
-five = Button(btns_frame, text = "5", fg = "white", highlightcolor="#505050", highlightbackground="#505050", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "hand2", command = lambda: btn_click(5)).grid(row = 2, column = 1, padx = 1, pady = 1)
- 
-six = Button(btns_frame, text = "6", fg = "white", highlightcolor="#505050", highlightbackground="#505050", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "hand2", command = lambda: btn_click(6)).grid(row = 2, column = 2, padx = 1, pady = 1)
- 
-minus = Button(btns_frame, text = "-", fg = "white", highlightcolor="#505050", highlightbackground="#505050", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "hand2", command = lambda: btn_click("-")).grid(row = 2, column = 3, padx = 1, pady = 1)
+four = tk.Button(btns_frame, text = "4", fg = "white", activebackground="#353535", activeforeground="#909090", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "arrow", command = lambda: btn_click(4))
+four.grid(row = 2, column = 0, padx = 1, pady = 1)
+four.bind("<Enter>", on_enter_numbers) 
+four.bind("<Leave>", on_leave_numbers) 
 
-sine = Button(btns_frame, text = "sen", fg = "white", highlightcolor="#505050", highlightbackground="#505050", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "hand2", command = lambda: btn_click("sen(")).grid(row = 2, column = 4, padx = 1, pady = 1)
- 
+five = tk.Button(btns_frame, text = "5", fg = "white", activebackground="#353535", activeforeground="#909090", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "arrow", command = lambda: btn_click(5))
+five.grid(row = 2, column = 1, padx = 1, pady = 1)
+five.bind("<Enter>", on_enter_numbers) 
+five.bind("<Leave>", on_leave_numbers) 
+
+six = tk.Button(btns_frame, text = "6", fg = "white", activebackground="#353535", activeforeground="#909090", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "arrow", command = lambda: btn_click(6))
+six.grid(row = 2, column = 2, padx = 1, pady = 1)
+six.bind("<Enter>", on_enter_numbers) 
+six.bind("<Leave>", on_leave_numbers)  
+
+minus = tk.Button(btns_frame, text = "-", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_click("-"))
+minus.grid(row = 2, column = 3, padx = 1, pady = 1)
+minus.bind("<Enter>", on_enter_symbols) 
+minus.bind("<Leave>", on_leave_symbols)
+
+sine = tk.Button(btns_frame, text = "sen", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_click("sen("))
+sine.grid(row = 2, column = 4, padx = 1, pady = 1)
+sine.bind("<Enter>", on_enter_symbols) 
+sine.bind("<Leave>", on_leave_symbols)
+
 # quarta linha
  
-one = Button(btns_frame, text = "1", fg = "white", highlightcolor="#505050", highlightbackground="#505050", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "hand2", command = lambda: btn_click(1)).grid(row = 3, column = 0, padx = 1, pady = 1)
- 
-two = Button(btns_frame, text = "2", fg = "white", highlightcolor="#505050", highlightbackground="#505050", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "hand2", command = lambda: btn_click(2)).grid(row = 3, column = 1, padx = 1, pady = 1)
- 
-three = Button(btns_frame, text = "3", fg = "white", highlightcolor="#505050", highlightbackground="#505050", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "hand2", command = lambda: btn_click(3)).grid(row = 3, column = 2, padx = 1, pady = 1)
- 
-plus = Button(btns_frame, text = "+", fg = "white", highlightcolor="#505050", highlightbackground="#505050", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "hand2", command = lambda: btn_click("+")).grid(row = 3, column = 3, padx = 1, pady = 1)
- 
-tangent = Button(btns_frame, text = "tan", fg = "white", highlightcolor="#505050", highlightbackground="#505050", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "hand2", command = lambda: btn_click("tan(")).grid(row = 3, column = 4, padx = 1, pady = 1)
+one = tk.Button(btns_frame, text = "1", fg = "white", activebackground="#353535", activeforeground="#909090", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "arrow", command = lambda: btn_click(1))
+one.grid(row = 3, column = 0, padx = 1, pady = 1)
+one.bind("<Enter>", on_enter_numbers) 
+one.bind("<Leave>", on_leave_numbers)  
+
+two = tk.Button(btns_frame, text = "2", fg = "white", activebackground="#353535", activeforeground="#909090", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "arrow", command = lambda: btn_click(2))
+two.grid(row = 3, column = 1, padx = 1, pady = 1)
+two.bind("<Enter>", on_enter_numbers) 
+two.bind("<Leave>", on_leave_numbers)  
+
+three = tk.Button(btns_frame, text = "3", fg = "white", activebackground="#353535", activeforeground="#909090", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "arrow", command = lambda: btn_click(3))
+three.grid(row = 3, column = 2, padx = 1, pady = 1)
+three.bind("<Enter>", on_enter_numbers) 
+three.bind("<Leave>", on_leave_numbers)  
+
+plus = tk.Button(btns_frame, text = "+", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_click("+"))
+plus.grid(row = 3, column = 3, padx = 1, pady = 1)
+plus.bind("<Enter>", on_enter_symbols) 
+plus.bind("<Leave>", on_leave_symbols)
+
+tangent = tk.Button(btns_frame, text = "tan", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_click("tan("))
+tangent.grid(row = 3, column = 4, padx = 1, pady = 1)
+tangent.bind("<Enter>", on_enter_symbols) 
+tangent.bind("<Leave>", on_leave_symbols)
 
 # quinta linha
  
-zero = Button(btns_frame, text = "0", fg = "white", highlightcolor="#505050", highlightbackground="#505050", font = ('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "hand2", command = lambda: btn_click(0)).grid(row = 4, column = 1, padx = 1, pady = 1)
- 
-point = Button(btns_frame, text = ".", fg = "white", highlightcolor="#505050", highlightbackground="#505050", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "hand2", command = lambda: btn_click(".")).grid(row = 4, column = 2, padx = 1, pady = 1)
- 
-equals = Button(btns_frame, text = "=", fg = "#303030", highlightcolor="#FF686B", highlightbackground="#FF686B", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#FF686B", cursor = "hand2", command = lambda: bt_equal()).grid(row = 4, column = 3, padx = 1, pady = 1)
+zero = tk.Button(btns_frame, text = "0", fg = "white", activebackground="#353535", activeforeground="#909090", font = ('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "arrow", command = lambda: btn_click(0))
+zero.grid(row = 4, column = 1, padx = 1, pady = 1)
+zero.bind("<Enter>", on_enter_numbers) 
+zero.bind("<Leave>", on_leave_numbers) 
 
-pi_button = Button(btns_frame, text = "π", fg = "white", highlightcolor="#505050", highlightbackground="#505050", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "hand2", command = lambda: btn_click("π")).grid(row = 4, column = 4, padx = 1, pady = 1)
- 
+point = tk.Button(btns_frame, text = ".", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_click("."))
+point.grid(row = 4, column = 2, padx = 1, pady = 1)
+point.bind("<Enter>", on_enter_symbols) 
+point.bind("<Leave>", on_leave_symbols)
+
+equals = tk.Button(btns_frame, text = "=", fg = "#303030", activebackground="#F44F45", activeforeground="#505050", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#FF686B", cursor = "arrow", command = lambda: bt_equal())
+equals.grid(row = 4, column = 3, padx = 1, pady = 1)
+equals.bind("<Enter>", on_enter_equal) 
+equals.bind("<Leave>", on_leave_equal)
+
+pi_button = tk.Button(btns_frame, text = "π", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_click("π"))
+pi_button.grid(row = 4, column = 4, padx = 1, pady = 1)
+pi_button.bind("<Enter>", on_enter_symbols) 
+pi_button.bind("<Leave>", on_leave_symbols)
+
 win.mainloop()

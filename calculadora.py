@@ -55,20 +55,25 @@ def bt_equal():
     global expression
     global error
 
-    if error == 1: 
-        error = 0
-        input_text.set(expression)
-        expression = ""
+    try:
+        if error == 1: 
+            error = 0
+            input_text.set(expression)
+            expression = ""
 
-    else:
-        if expression != "":
-            result = str(eval(expression))
-            if result == "0" or result == "0.0":
-                expression = ""
-            else:
-                expression = result
-            input_text.set(result)
-        else: input_text.set("0")
+        else:
+            if expression != "":
+                result = str(eval(expression))
+                if result == "0" or result == "0.0":
+                    expression = ""
+                else:
+                    expression = result
+                input_text.set(result)
+            else: input_text.set("0")
+
+    except ZeroDivisionError:
+        expression = ""
+        input_text.set("Resultado indefinido")
 
 π = math.pi
 
@@ -103,7 +108,7 @@ def tan(x):
             error = 1
             return "Entrada inválida"
 
-    if round(result, 2) == 0: return 0
+    elif round(result, 2) == 0: return 0
 
     return result
 
@@ -115,6 +120,17 @@ def btn_backspace():
     if expression == "":
         input_text.set("0")
     else:
+        input_text.set(expression)
+
+def btn_plus_minus():
+    global expression
+
+    if expression == "": expression = expression
+    else:
+        if expression[0] == "-": expression = expression[1:]
+        elif expression == "0": expression = expression
+        else: expression = "-" + expression
+    
         input_text.set(expression)
 
 def on_enter_symbols(e):
@@ -263,16 +279,21 @@ tangent.bind("<Enter>", on_enter_symbols)
 tangent.bind("<Leave>", on_leave_symbols)
 
 # quinta linha
- 
+
+plus_minus_bt = tk.Button(btns_frame, text = "±", fg = "white", activebackground="#353535", activeforeground="#909090", font = ('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "arrow", command = lambda: btn_plus_minus())
+plus_minus_bt.grid(row = 4, column = 0, padx = 1, pady = 1)
+plus_minus_bt.bind("<Enter>", on_enter_numbers) 
+plus_minus_bt.bind("<Leave>", on_leave_numbers) 
+
 zero = tk.Button(btns_frame, text = "0", fg = "white", activebackground="#353535", activeforeground="#909090", font = ('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "arrow", command = lambda: btn_click(0))
 zero.grid(row = 4, column = 1, padx = 1, pady = 1)
 zero.bind("<Enter>", on_enter_numbers) 
 zero.bind("<Leave>", on_leave_numbers) 
 
-point = tk.Button(btns_frame, text = ".", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_click("."))
+point = tk.Button(btns_frame, text = ".", fg = "white", activebackground="#353535", activeforeground="#909090", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "arrow", command = lambda: btn_click("."))
 point.grid(row = 4, column = 2, padx = 1, pady = 1)
-point.bind("<Enter>", on_enter_symbols) 
-point.bind("<Leave>", on_leave_symbols)
+point.bind("<Enter>", on_enter_numbers) 
+point.bind("<Leave>", on_leave_numbers)
 
 equals = tk.Button(btns_frame, text = "=", fg = "#303030", activebackground="#F44F45", activeforeground="#505050", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#FF686B", cursor = "arrow", command = lambda: bt_equal())
 equals.grid(row = 4, column = 3, padx = 1, pady = 1)

@@ -75,6 +75,9 @@ def bt_equal():
         expression = ""
         input_text.set("Resultado indefinido")
 
+    except SyntaxError:
+        input_text.set("Erro de sintaxe")
+
 π = math.pi
 
 def cos(x):

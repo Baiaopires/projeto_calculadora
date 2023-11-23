@@ -10,7 +10,7 @@ win.resizable(1, 1)
 win.title("Calculadora")
 win.configure(bg = "#303030")
 
-list_of_operators = ["/", "*", "+", "-"]
+list_of_operators = ["/", "*", "+", "-", "**"]
 π = math.pi
 e = math.e
 number_of_rows = 7
@@ -237,7 +237,7 @@ def on_key_press(event):
         btn_click("*")
     elif key == "/":
         btn_click("/")
-    elif key == "^" or (event.keysym == "asciicircum" and event.state == 0):  # Corrigido para verificar Shift
+    elif key == "^^" or (event.keysym == "asciicircum" and event.state == 0):  # Corrigido para verificar Shift
         btn_click("**")
     elif key == "." or key == ",":
         btn_click(".")

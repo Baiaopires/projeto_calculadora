@@ -5,7 +5,7 @@ from sympy import symbols, diff, integrate
 x, y, z = symbols('x y z')
 
 win = tk.Tk()
-win.geometry("466x424")
+win.geometry("466x485")
 win.resizable(1, 1)
 win.title("Calculadora")
 win.configure(bg = "#303030")
@@ -13,7 +13,7 @@ win.configure(bg = "#303030")
 list_of_operators = ["/", "*", "+", "-"]
 π = math.pi
 e = math.e
-number_of_rows = 6
+number_of_rows = 7
 number_of_columns = 6
 
 def btn_click(item):
@@ -160,6 +160,21 @@ def d_dz(item):
 
     return result
 
+def integral_x(item):
+    result = integrate(item, x)
+
+    return result
+
+def integral_y(item):
+    result = integrate(item, y)
+
+    return result
+
+def integral_z(item):
+    result = integrate(item, z)
+
+    return result
+
 def derivar_y(self):
     expr = self.entry.get()
     try:
@@ -174,26 +189,6 @@ def derivar_xy(self):
     expr = self.entry.get()
     try:
         result = diff(expr, x) + diff(expr, y)
-        self.entry.delete(0, tk.END)
-        self.entry.insert(tk.END, str(result))
-    except Exception as e:
-        self.entry.delete(0, tk.END)
-        self.entry.insert(tk.END, "Erro")
-
-def integrar_x(self):
-    expr = self.entry.get()
-    try:
-        result = integrate(expr, x)
-        self.entry.delete(0, tk.END)
-        self.entry.insert(tk.END, str(result))
-    except Exception as e:
-        self.entry.delete(0, tk.END)
-        self.entry.insert(tk.END, "Erro")
-
-def integrar_y(self):
-    expr = self.entry.get()
-    try:
-        result = integrate(expr, y)
         self.entry.delete(0, tk.END)
         self.entry.insert(tk.END, str(result))
     except Exception as e:
@@ -227,6 +222,43 @@ def on_enter_equal(e):
 
 def on_leave_equal(e):
     e.widget['background'] = "#FF686B"
+
+def on_key_press(event):
+    key = event.char
+    if key in "0123456789":
+        try:
+            btn_click(int(key))
+        except ValueError: pass
+    elif key == "+":
+        btn_click("+")
+    elif key == "-":
+        btn_click("-")
+    elif key == "*":
+        btn_click("*")
+    elif key == "/":
+        btn_click("/")
+    elif key == "^" or (event.keysym == "asciicircum" and event.state == 0):  # Corrigido para verificar Shift
+        btn_click("**")
+    elif key == "." or key == ",":
+        btn_click(".")
+    elif key == "enter":
+        btn_click("=")
+    elif key.lower() == "x":
+        btn_click("x")
+    elif key.lower() == "y":
+        btn_click("y")
+    elif key.lower() == "z":
+        btn_click("z")
+    elif key == "(":
+        btn_click("(")
+    elif key == ")":
+        btn_click(")")
+    elif key == "\r":
+        bt_equal()
+    elif event.keysym == "BackSpace":
+        btn_backspace()
+
+win.bind("<Key>", on_key_press)
  
 expression = ""
 error = 0
@@ -273,6 +305,12 @@ backspace = tk.Button(btns_frame, text = "⌫", fg = "white", activebackground="
 backspace.grid(row = 0, column = 4, padx = 1, pady = 1, sticky="NSEW")
 backspace.bind("<Enter>", on_enter_symbols) 
 backspace.bind("<Leave>", on_leave_symbols)
+
+modulo = tk.Button(btns_frame, text="amod", fg="white", activebackground="#404040", activeforeground="#909090", font=('arial', 14),
+                   width=6, height=2, bd=0, bg="#404040", cursor="arrow", command=lambda: btn_click("%"))
+modulo.grid(row = 0, column = 5, padx=1, pady=1, sticky="NSEW")
+modulo.bind("<Enter>", on_enter_symbols)
+modulo.bind("<Leave>", on_leave_symbols)
 
 #segunda linha
  
@@ -355,6 +393,13 @@ tangent.grid(row = 3, column = 4, padx = 1, pady = 1, sticky="NSEW")
 tangent.bind("<Enter>", on_enter_symbols) 
 tangent.bind("<Leave>", on_leave_symbols)
 
+power = tk.Button(btns_frame, text="^", fg="white", activebackground="#404040", activeforeground="#909090", font=('arial', 14),
+                  width=6, height=2, bd=0, bg="#404040", cursor="arrow", command=lambda: btn_click("**"))
+power.grid(row=3, column=5, padx=1, pady=1, sticky="NSEW")
+power.bind("<Enter>", on_enter_symbols)
+power.bind("<Leave>", on_leave_symbols)
+
+
 # quinta linha
 
 plus_minus_bt = tk.Button(btns_frame, text = "±", fg = "white", activebackground="#353535", activeforeground="#909090", font = ('arial', 14), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "arrow", command = lambda: btn_plus_minus())
@@ -418,6 +463,22 @@ diff_z = tk.Button(btns_frame, text = "dz", fg = "white", activebackground="#404
 diff_z.grid(row = 5, column = 5, padx = 1, pady = 1, sticky="NSEW")
 diff_z.bind("<Enter>", on_enter_symbols) 
 diff_z.bind("<Leave>", on_leave_symbols)
+
+#setima linha
+integral_x_bt = tk.Button(btns_frame, text="∫dx", fg="white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'italic'), width=6, height=2, bd=0, bg="#404040", cursor="arrow", command=lambda: btn_click("(integral_x("))
+integral_x_bt.grid(row=6, column=0, padx=1, pady=1, sticky="NSEW")
+integral_x_bt.bind("<Enter>", on_enter_symbols)
+integral_x_bt.bind("<Leave>", on_leave_symbols)
+
+integral_y_bt = tk.Button(btns_frame, text="∫dy", fg="white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'italic'), width=6, height=2, bd=0, bg="#404040", cursor="arrow", command=lambda: btn_click("(integral_y("))
+integral_y_bt.grid(row=6, column=1, padx=1, pady=1, sticky="NSEW")
+integral_y_bt.bind("<Enter>", on_enter_symbols)
+integral_y_bt.bind("<Leave>", on_leave_symbols)
+
+integral_z_bt = tk.Button(btns_frame, text="∫dz", fg="white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'italic'), width=6, height=2, bd=0, bg="#404040", cursor="arrow", command=lambda: btn_click("(integral_z("))
+integral_z_bt.grid(row=6, column=2, padx=1, pady=1, sticky="NSEW")
+integral_z_bt.bind("<Enter>", on_enter_symbols)
+integral_z_bt.bind("<Leave>", on_leave_symbols)
 
 for i in range(number_of_rows): tk.Grid.rowconfigure(btns_frame, i, weight = 1)
 for i in range(number_of_columns): tk.Grid.columnconfigure(btns_frame, i, weight = 1)

@@ -11,6 +11,9 @@ win.title("Calculadora")
 win.configure(bg = "#303030")
 
 list_of_operators = ["/", "*", "+", "-", "**"]
+list_of_functions = ["cos(", "sen(", "tan(", "log(", "sqrt(", "(d_dx(", "(d_dy(", "(d_dz(", "(integral_x(", "(integral_y(", "(integral_z("]
+list_of_constants = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "π", "e"]
+
 π = math.pi
 e = math.e
 number_of_rows = 7
@@ -48,6 +51,11 @@ def btn_click(item):
     elif expression[-1] in list_of_operators and item in list_of_operators:
         expression = expression[:-1] + str(item)
 
+    elif item in list_of_functions or item == "(":
+        if expression[-1] in list_of_constants:
+          expression = expression + "*" + str(item)
+        else: expression = expression + str(item)
+        
     else:
         expression = expression + str(item)
 
@@ -74,6 +82,8 @@ def bt_equal():
                 if (expression.count('(') - expression.count(')')) > 0: 
                     for i in range(expression.count('(') - expression.count(')')): expression = expression + ")"                    
 
+                #expression = expression.replace("sqrt(", "square_root(")
+                
                 result = str(eval(expression))
                 if result == "0" or result == "0.0":
                     expression = ""
@@ -121,6 +131,16 @@ def tan(x):
             return "Entrada inválida"
 
     elif round(result, 2) == 0: return 0
+
+    return result
+
+def sqrt(x):
+    result = math.sqrt(float(x))
+
+    return result
+
+def log(x):
+    result = math.log10(x)
 
     return result
 
@@ -306,8 +326,7 @@ backspace.grid(row = 0, column = 4, padx = 1, pady = 1, sticky="NSEW")
 backspace.bind("<Enter>", on_enter_symbols) 
 backspace.bind("<Leave>", on_leave_symbols)
 
-modulo = tk.Button(btns_frame, text="amod", fg="white", activebackground="#404040", activeforeground="#909090", font=('arial', 14),
-                   width=6, height=2, bd=0, bg="#404040", cursor="arrow", command=lambda: btn_click("%"))
+modulo = tk.Button(btns_frame, text="amod", fg="white", activebackground="#404040", activeforeground="#909090", font=('arial', 14), width=6, height=2, bd=0, bg="#404040", cursor="arrow", command=lambda: btn_click("%"))
 modulo.grid(row = 0, column = 5, padx=1, pady=1, sticky="NSEW")
 modulo.bind("<Enter>", on_enter_symbols)
 modulo.bind("<Leave>", on_leave_symbols)
@@ -339,6 +358,11 @@ cossine.grid(row = 1, column = 4, padx = 1, pady = 1, sticky="NSEW")
 cossine.bind("<Enter>", on_enter_symbols) 
 cossine.bind("<Leave>", on_leave_symbols)
 
+log_btn = tk.Button(btns_frame, text="log", fg="white", activebackground="#404040", activeforeground="#909090", font=('arial', 14), width=6, height=2, bd=0, bg="#404040", cursor="arrow", command=lambda: btn_click("log("))
+log_btn.grid(row=1, column=5, padx=1, pady=1, sticky="NSEW")
+log_btn.bind("<Enter>", on_enter_symbols)
+log_btn.bind("<Leave>", on_leave_symbols)
+
 # terceira linha
  
 four = tk.Button(btns_frame, text = "4", fg = "white", activebackground="#353535", activeforeground="#909090", font=('arial', 14, 'bold'), width = 6, height = 2, bd = 0, bg = "#505050", cursor = "arrow", command = lambda: btn_click(4))
@@ -365,6 +389,11 @@ sine = tk.Button(btns_frame, text = "sen", fg = "white", activebackground="#4040
 sine.grid(row = 2, column = 4, padx = 1, pady = 1, sticky="NSEW")
 sine.bind("<Enter>", on_enter_symbols) 
 sine.bind("<Leave>", on_leave_symbols)
+
+sqrt_btn = tk.Button(btns_frame, text="√", fg="white", activebackground="#404040", activeforeground="#909090", font=('arial', 14), width=6, height=2, bd=0, bg="#404040", cursor="arrow", command=lambda: btn_click("sqrt("))
+sqrt_btn.grid(row=2, column=5, padx=1, pady=1, sticky="NSEW")
+sqrt_btn.bind("<Enter>", on_enter_symbols)
+sqrt_btn.bind("<Leave>", on_leave_symbols)
 
 # quarta linha
  
@@ -393,8 +422,7 @@ tangent.grid(row = 3, column = 4, padx = 1, pady = 1, sticky="NSEW")
 tangent.bind("<Enter>", on_enter_symbols) 
 tangent.bind("<Leave>", on_leave_symbols)
 
-power = tk.Button(btns_frame, text="^", fg="white", activebackground="#404040", activeforeground="#909090", font=('arial', 14),
-                  width=6, height=2, bd=0, bg="#404040", cursor="arrow", command=lambda: btn_click("**"))
+power = tk.Button(btns_frame, text="^", fg="white", activebackground="#404040", activeforeground="#909090", font=('arial', 14), width=6, height=2, bd=0, bg="#404040", cursor="arrow", command=lambda: btn_click("**"))
 power.grid(row=3, column=5, padx=1, pady=1, sticky="NSEW")
 power.bind("<Enter>", on_enter_symbols)
 power.bind("<Leave>", on_leave_symbols)
@@ -465,6 +493,7 @@ diff_z.bind("<Enter>", on_enter_symbols)
 diff_z.bind("<Leave>", on_leave_symbols)
 
 #setima linha
+
 integral_x_bt = tk.Button(btns_frame, text="∫dx", fg="white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'italic'), width=6, height=2, bd=0, bg="#404040", cursor="arrow", command=lambda: btn_click("(integral_x("))
 integral_x_bt.grid(row=6, column=0, padx=1, pady=1, sticky="NSEW")
 integral_x_bt.bind("<Enter>", on_enter_symbols)

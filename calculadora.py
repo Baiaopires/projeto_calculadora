@@ -4,15 +4,16 @@ from sympy import symbols, diff, integrate
 
 x, y, z = symbols('x y z')
 
-windows_size = "466x485"
+windows_size = "482x484"
 
 win = tk.Tk()
-win.geometry(windows_size)
+win.geometry("482x484")
 win.resizable(1, 1)
 win.title("Calculadora")
 #win.iconbitmap('calculator_icon-icons.com_54044.ico')
 win.configure(bg="#303030")
 
+list_of_variables = ["x", "y", "z"]
 list_of_operators = ["/", "*", "+", "-", "**"]
 list_of_functions = ["cos(", "sen(", "tan(", "log(", "sqrt(", "d_dx(", "d_dy(", "d_dz(", "integral_x(", "integral_y(", "integral_z("]
 list_of_constants = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "π", "e"]
@@ -66,7 +67,7 @@ def btn_click(item):
     elif expression[-1] in list_of_operators and item in list_of_operators:
         expression = expression[:-1] + str(item)
 
-    elif item in list_of_functions or item == "(":
+    elif item in list_of_functions or item == "(" or item in list_of_variables:
         if expression[-1] in list_of_constants:
             expression = expression + "*" + str(item)
         else:
@@ -107,11 +108,23 @@ def bt_equal():
                 if (expression.count('(') - expression.count(')')) > 0: 
                     for i in range(expression.count('(') - expression.count(')')): expression = expression + ")"                    
                 
-                result = str(round(eval(expression), 8))
+                result = str(eval(expression))
+
+                bool_value = 0
+
+                for i in list_of_variables:
+                    if i in result: bool_value = 1
+
+                if bool_value == 0:
+                    result = str(round(eval(expression), 8))
+                else: bool_value = 0
+
                 if result == "0" or result == "0.0":
                     expression = ""
                 else:
+                    add_to_history(expression, result)
                     expression = result
+                    
                 input_text.set(result)
             else: input_text.set("0")
 
@@ -124,7 +137,7 @@ def bt_equal():
         input_text.set(str(e))
 
     except SyntaxError as e:
-        input_text.set(str(e))
+        input_text.set("Erro de sintaxe")
 
 # Função para exibir o histórico de contas
 def show_history():

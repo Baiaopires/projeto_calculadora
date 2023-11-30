@@ -4,20 +4,29 @@ from sympy import symbols, diff, integrate
 
 x, y, z = symbols('x y z')
 
+windows_size = "466x485"
+
 win = tk.Tk()
-win.geometry("466x485")
+win.geometry(windows_size)
 win.resizable(1, 1)
 win.title("Calculadora")
-win.configure(bg = "#303030")
+#win.iconbitmap('calculator_icon-icons.com_54044.ico')
+win.configure(bg="#303030")
 
 list_of_operators = ["/", "*", "+", "-", "**"]
-list_of_functions = ["cos(", "sen(", "tan(", "log(", "sqrt(", "(d_dx(", "(d_dy(", "(d_dz(", "(integral_x(", "(integral_y(", "(integral_z("]
+list_of_functions = ["cos(", "sen(", "tan(", "log(", "sqrt(", "d_dx(", "d_dy(", "d_dz(", "integral_x(", "integral_y(", "integral_z("]
 list_of_constants = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "π", "e"]
 
 π = math.pi
 e = math.e
 number_of_rows = 7
 number_of_columns = 6
+
+history_list = []
+
+# Função para adicionar uma expressão ao histórico
+def add_to_history(expression, result):
+    history_list.append(f"{expression} = {result}")
 
 def btn_click(item):
     global expression
@@ -27,46 +36,62 @@ def btn_click(item):
         if expression == "" or expression == "0.":
             expression = "0."
         else:
-            if expression[-1] == ".": expression = expression
-            else: 
+            if expression[-1] == ".":
+                expression = expression
+            else:
                 for i in range(10):
                     if expression[-1] == str(i):
                         bool_value = 1
-                        if expression[-1] == ".": expression = expression
-                        else: expression = expression + str(item)
+                        if expression[-1] == ".":
+                            expression = expression
+                        else:
+                            expression = expression + str(item)
                 if bool_value == 0:
                     expression = expression + "0."
     elif expression == "":
         if item in list_of_operators:
             expression = "0" + str(item)
-        elif item == ")": expression = expression
-        else: expression = expression + str(item)
+        elif item == ")":
+            expression = expression
+        else:
+            expression = expression + str(item)
 
     elif expression == "0":
-        if item == 0: expression = "0"
+        if item == 0:
+            expression = "0"
 
     elif expression[-1] == "." and item in list_of_operators:
         expression = expression + "0" + str(item)
-    
+
     elif expression[-1] in list_of_operators and item in list_of_operators:
         expression = expression[:-1] + str(item)
 
     elif item in list_of_functions or item == "(":
         if expression[-1] in list_of_constants:
-          expression = expression + "*" + str(item)
-        else: expression = expression + str(item)
-        
+            expression = expression + "*" + str(item)
+        else:
+            expression = expression + str(item)
+
     else:
         expression = expression + str(item)
 
     input_text.set(expression)
 
-def bt_clear(): 
+def bt_clear():
     global expression
 
-    expression = "" 
+    expression = ""
     input_text.set(0)
- 
+
+history_text = tk.StringVar()
+history_text.set("Histórico de Operações:\n")
+
+def update_history(result):
+    current_history = history_text.get()
+    new_entry = f"{expression} = {result}\n"
+    new_history = current_history + new_entry
+    history_text.set(new_history)
+
 def bt_equal():
     global expression
     global error
@@ -81,10 +106,8 @@ def bt_equal():
             if expression != "":
                 if (expression.count('(') - expression.count(')')) > 0: 
                     for i in range(expression.count('(') - expression.count(')')): expression = expression + ")"                    
-
-                #expression = expression.replace("sqrt(", "square_root(")
                 
-                result = str(eval(expression))
+                result = str(round(eval(expression), 8))
                 if result == "0" or result == "0.0":
                     expression = ""
                 else:
@@ -96,44 +119,78 @@ def bt_equal():
         expression = ""
         input_text.set("Resultado indefinido")
 
-    except SyntaxError:
-        input_text.set("Erro de sintaxe")
+    except ValueError as e:
+        expression = ""
+        input_text.set(str(e))
 
+    except SyntaxError as e:
+        input_text.set(str(e))
+
+# Função para exibir o histórico de contas
+def show_history():
+    history_window = tk.Toplevel(win)
+    history_window.title("Histórico de Contas")
+    history_window.geometry(windows_size)
+    history_window.configure(bg="#FF8000")
+    #history_window.iconbitmap('./counterclockwiserotatingarrowaroundaclock_79793.ICO')
+
+    history_text = tk.Text(history_window, wrap=tk.WORD, font=('arial', 12), bg="#303030", fg="white")
+    history_text.pack(expand=True, fill="both")
+
+    # Adiciona as contas ao widget de texto
+    for entry in history_list:
+        history_text.insert(tk.END, entry + "\n")
+
+    # Função para limpar o histórico
+    def clear_history():
+        history_text.delete(1.0, tk.END)
+        history_list.clear()
+
+     # Botão para limpar o histórico
+    clear_button = tk.Button(history_window, text="Limpar Histórico", fg="white", activebackground="#FF8000", activeforeground="#DEDEDE", font=('arial', 12, 'bold'), width=1080, height=20, bd=0, bg="#FF8000", cursor="arrow", command=clear_history)
+    clear_button.pack(side=tk.BOTTOM, pady=0, expand=False)
+    clear_button.bind("<Enter>", on_enter_history_btn) 
+    clear_button.bind("<Leave>", on_leave_history_btn)
+        
 def cos(x):
-    result = math.cos((x*math.pi)/180.0)
+    result = math.cos((x * math.pi) / 180.0)
 
-    if x%90 == 0:
-        if round(result, 2) != 0:
-            return round(result, 2)
-        else: 
-            return 0 
-    return result
+    if x % 90 == 0:
+        if round(result, 6) != 0:
+            return round(result, 6)
+        else:
+            return 0
+    return round(result, 6)
 
 def sen(x):
-    result = math.sin((x*math.pi)/180.0)
+    result = math.sin((x * math.pi) / 180.0)
 
-    if x%90 == 0:
-        if round(result, 2) != 0:
-            return round(result, 2)
-        else: 
+    if x % 90 == 0:
+        if round(result, 6) != 0:
+            return round(result, 6)
+        else:
             return 0
-        
-    return result
+    return round(result, 6)
+
+expression = ""
+error = 0
 
 def tan(x):
     global expression
     global error
-    result = math.tan((x*math.pi)/180.0)
 
-    if round(result, 2) != 0:
-        if x%90 == 0:
-            error = 1
-            return "Entrada inválida"
+    if x % 90 == 0 and (x // 90) % 2 != 0:
+        # Tangente indefinida para ângulos ímpares de múltiplos de 90 graus
+        error = 1
+        return "Tangente indefinida"
+    
+    result = math.tan((x * math.pi) / 180.0)
 
-    elif round(result, 2) == 0: return 0
+    if round(result, 6) == 0:
+        return 0
 
     return result
-
+        
 def sqrt(x):
     result = math.sqrt(float(x))
 
@@ -243,6 +300,12 @@ def on_enter_equal(e):
 def on_leave_equal(e):
     e.widget['background'] = "#FF686B"
 
+def on_enter_history_btn(e):
+    e.widget['background'] = "#DA6D00"
+
+def on_leave_history_btn(e):
+    e.widget['background'] = "#FF8000"
+
 def on_key_press(event):
     key = event.char
     if key in "0123456789":
@@ -300,7 +363,12 @@ btns_frame = tk.Frame(win, width=312, height=272.5, bg="#303030")
 btns_frame.pack()
 
 #primeira linha
- 
+
+history_button = tk.Button(win, text="Histórico", fg="white", activebackground="#FF8000", activeforeground="#DEDEDE", font=('arial', 14, 'bold'), width=12, height=2, bd=0, bg="#FF8000", cursor="arrow", command=show_history)
+history_button.place(x=4, y=4)
+history_button.bind("<Enter>", on_enter_history_btn) 
+history_button.bind("<Leave>", on_leave_history_btn)
+
 clear = tk.Button(btns_frame, text = "C", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: bt_clear())
 clear.grid(row = 0, column = 0, padx = 1, pady = 1, sticky="NSEW")
 clear.bind("<Enter>", on_enter_symbols) 
@@ -477,39 +545,41 @@ z_button.grid(row = 5, column = 2, padx = 1, pady = 1, sticky="NSEW")
 z_button.bind("<Enter>", on_enter_numbers) 
 z_button.bind("<Leave>", on_leave_numbers)
 
-diff_x = tk.Button(btns_frame, text = "dx", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'italic'), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_click("(d_dx("))
+diff_x = tk.Button(btns_frame, text = "dx", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'italic'), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_click("d_dx("))
 diff_x.grid(row = 5, column = 3, padx = 1, pady = 1, sticky="NSEW")
 diff_x.bind("<Enter>", on_enter_symbols) 
 diff_x.bind("<Leave>", on_leave_symbols)
 
-diff_y = tk.Button(btns_frame, text = "dy", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'italic'), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_click("(d_dy("))
+diff_y = tk.Button(btns_frame, text = "dy", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'italic'), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_click("d_dy("))
 diff_y.grid(row = 5, column = 4, padx = 1, pady = 1, sticky="NSEW")
 diff_y.bind("<Enter>", on_enter_symbols) 
 diff_y.bind("<Leave>", on_leave_symbols)
 
-diff_z = tk.Button(btns_frame, text = "dz", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'italic'), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_click("(d_dz("))
+diff_z = tk.Button(btns_frame, text = "dz", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'italic'), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_click("d_dz("))
 diff_z.grid(row = 5, column = 5, padx = 1, pady = 1, sticky="NSEW")
 diff_z.bind("<Enter>", on_enter_symbols) 
 diff_z.bind("<Leave>", on_leave_symbols)
 
 #setima linha
 
-integral_x_bt = tk.Button(btns_frame, text="∫dx", fg="white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'italic'), width=6, height=2, bd=0, bg="#404040", cursor="arrow", command=lambda: btn_click("(integral_x("))
+integral_x_bt = tk.Button(btns_frame, text="∫dx", fg="white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'italic'), width=6, height=2, bd=0, bg="#404040", cursor="arrow", command=lambda: btn_click("integral_x("))
 integral_x_bt.grid(row=6, column=0, padx=1, pady=1, sticky="NSEW")
 integral_x_bt.bind("<Enter>", on_enter_symbols)
 integral_x_bt.bind("<Leave>", on_leave_symbols)
 
-integral_y_bt = tk.Button(btns_frame, text="∫dy", fg="white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'italic'), width=6, height=2, bd=0, bg="#404040", cursor="arrow", command=lambda: btn_click("(integral_y("))
+integral_y_bt = tk.Button(btns_frame, text="∫dy", fg="white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'italic'), width=6, height=2, bd=0, bg="#404040", cursor="arrow", command=lambda: btn_click("integral_y("))
 integral_y_bt.grid(row=6, column=1, padx=1, pady=1, sticky="NSEW")
 integral_y_bt.bind("<Enter>", on_enter_symbols)
 integral_y_bt.bind("<Leave>", on_leave_symbols)
 
-integral_z_bt = tk.Button(btns_frame, text="∫dz", fg="white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'italic'), width=6, height=2, bd=0, bg="#404040", cursor="arrow", command=lambda: btn_click("(integral_z("))
+integral_z_bt = tk.Button(btns_frame, text="∫dz", fg="white", activebackground="#404040", activeforeground="#909090", font=('arial', 14, 'italic'), width=6, height=2, bd=0, bg="#404040", cursor="arrow", command=lambda: btn_click("integral_z("))
 integral_z_bt.grid(row=6, column=2, padx=1, pady=1, sticky="NSEW")
 integral_z_bt.bind("<Enter>", on_enter_symbols)
 integral_z_bt.bind("<Leave>", on_leave_symbols)
 
-for i in range(number_of_rows): tk.Grid.rowconfigure(btns_frame, i, weight = 1)
-for i in range(number_of_columns): tk.Grid.columnconfigure(btns_frame, i, weight = 1)
+for i in range(number_of_rows):
+    tk.Grid.rowconfigure(btns_frame, i, weight=1)
+for i in range(number_of_columns):
+    tk.Grid.columnconfigure(btns_frame, i, weight=1, uniform='columns')
 
 win.mainloop()

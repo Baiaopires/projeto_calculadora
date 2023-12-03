@@ -105,9 +105,15 @@ def bt_equal():
 
         else:
             if expression != "":
+                # Verifica se os parênteses estão balanceados
                 if (expression.count('(') - expression.count(')')) > 0: 
                     for i in range(expression.count('(') - expression.count(')')): expression = expression + ")"                    
                 
+                if "sqrt(" in expression:
+                    num = float(expression.split("sqrt(")[1].split(")")[0])
+                    if num < 0:
+                        raise ValueError("Entrada Inválida")
+
                 result = str(eval(expression))
 
                 bool_value = 0

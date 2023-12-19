@@ -244,7 +244,7 @@ def plot_graph():
             fig = plt.figure(facecolor='#303030')
             ax = fig.add_subplot(facecolor="#303030")
 
-            x_vals = np.linspace(-10, 10, 100)
+            x_vals = np.linspace(-50, 50, 100)
             y_vals = np.vectorize(lambda v: expr.subs(x, v))(x_vals)
             
             title = "Gráfico 2D da expressão y = " + expression
@@ -268,8 +268,8 @@ def plot_graph():
             fig = plt.figure(facecolor='#303030')
             ax = fig.add_subplot(111, projection='3d', facecolor="#303030")
             
-            x_vals = np.linspace(-1000, 1000, 100)
-            y_vals = np.linspace(-1000, 1000, 100)
+            x_vals = np.linspace(-50, 50, 100)
+            y_vals = np.linspace(-50, 50, 100)
             X, Y = np.meshgrid(x_vals, y_vals)
             
             Z = np.vectorize(lambda v1, v2: expr.subs({x: v1, y: v2}))(X, Y)

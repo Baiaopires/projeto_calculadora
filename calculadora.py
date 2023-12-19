@@ -1,6 +1,9 @@
 import tkinter as tk
 import math
-from sympy import symbols, diff, integrate
+import matplotlib.pyplot as plt
+import numpy as np
+from mpl_toolkits.mplot3d import Axes3D  # Importe para gráficos 3D
+from sympy import symbols, diff, integrate, sympify
 
 x, y, z = symbols('x y z')
 
@@ -220,6 +223,82 @@ def log(x):
 
     return result
 
+def plot_graph():
+    try:
+        # Obtenha a expressão atual do campo de entrada
+        expression = input_text.get()
+        
+        # Crie uma expressão simbólica usando a biblioteca sympy
+        x, y, z = symbols('x y z')  # Adicione z para gráficos 3D
+        expr = sympify(expression)
+        
+        # Determine a dimensão da expressão
+        dimension = expr.free_symbols
+        dimension_count = len(dimension)
+        
+        #Definição da fonte do título
+        csfont = {'fontname':'Arial'}
+
+        if dimension_count == 1:
+            # Gráfico 2D
+            fig = plt.figure(facecolor='#303030')
+            ax = fig.add_subplot(facecolor="#303030")
+
+            x_vals = np.linspace(-10, 10, 100)
+            y_vals = np.vectorize(lambda v: expr.subs(x, v))(x_vals)
+            
+            title = "Gráfico 2D da expressão y = " + expression
+
+            ax.plot(x_vals, y_vals)
+            ax.set_title(title, color='white', fontdict=csfont, fontweight="bold")
+            ax.set_xlabel('x')
+            ax.set_ylabel('y')
+            ax.xaxis.label.set_color('white')
+            ax.yaxis.label.set_color('white')
+            ax.tick_params(axis='x', colors='white')
+            ax.tick_params(axis='y', colors='white')
+            for axis in ['top', 'bottom', 'left', 'right']:
+                ax.spines[axis].set_color('white')
+
+            plt.grid(color = '#505050', linestyle = 'dashed', linewidth = 1)
+            plt.show()
+            
+        elif dimension_count == 2:
+            # Gráfico 3D
+            fig = plt.figure(facecolor='#303030')
+            ax = fig.add_subplot(111, projection='3d', facecolor="#303030")
+            
+            x_vals = np.linspace(-10, 10, 100)
+            y_vals = np.linspace(-10, 10, 100)
+            X, Y = np.meshgrid(x_vals, y_vals)
+            
+            Z = np.vectorize(lambda v1, v2: expr.subs({x: v1, y: v2}))(X, Y)
+
+            title = "Gráfico 3D da expressão z = " + expression
+
+            ax.plot_surface(X, Y, Z, cmap='viridis')
+            ax.set_title(title, color='white', fontdict=csfont, fontweight="bold")
+            ax.set_xlabel('x')
+            ax.set_ylabel('y')
+            ax.set_zlabel('z')
+            ax.xaxis.label.set_color('white')
+            ax.yaxis.label.set_color('white')
+            ax.zaxis.label.set_color('white')
+            ax.tick_params(axis='x', colors='white')
+            ax.tick_params(axis='y', colors='white')
+            ax.tick_params(axis='z', colors='white')
+            ax.spines['left'].set_color('white')
+            ax.spines['top'].set_color('white')
+            
+            plt.show()
+            
+        else:
+            print("A expressão tem mais de duas variáveis. Não é possível plotar automaticamente.")
+            
+    except Exception as e:
+        # Trate qualquer exceção que possa ocorrer durante a plotagem
+        print(f"Erro ao plotar o gráfico: {e}")
+    
 def btn_backspace():
     global expression
 
@@ -595,6 +674,12 @@ integral_z_bt = tk.Button(btns_frame, text="∫dz", fg="white", activebackground
 integral_z_bt.grid(row=6, column=2, padx=1, pady=1, sticky="NSEW")
 integral_z_bt.bind("<Enter>", on_enter_symbols)
 integral_z_bt.bind("<Leave>", on_leave_symbols)
+
+plot_button = tk.Button(btns_frame, text="Plotar Gráfico", fg="white", activebackground="#404040", activeforeground="#909090", font=('arial', 14), width=12, height=2, bd=0, bg="#404040", cursor="arrow", command=plot_graph)
+plot_button.grid(row=6, column=3, columnspan=6, padx=1, pady=1, sticky="NSEW")
+plot_button.bind("<Enter>", on_enter_symbols)
+plot_button.bind("<Leave>", on_leave_symbols)
+
 
 for i in range(number_of_rows):
     tk.Grid.rowconfigure(btns_frame, i, weight=1)

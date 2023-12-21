@@ -13,7 +13,7 @@ win = tk.Tk()
 win.geometry("482x484")
 win.resizable(1, 1)
 win.title("Calculadora")
-#win.iconbitmap('calculator_icon-icons.com_54044.ico')
+win.iconbitmap('calculator_icon-icons.com_54044.ico')
 win.configure(bg="#303030")
 
 list_of_variables = ["x", "y", "z"]
@@ -154,7 +154,7 @@ def show_history():
     history_window.title("Histórico de Contas")
     history_window.geometry(windows_size)
     history_window.configure(bg="#FF8000")
-    #history_window.iconbitmap('./counterclockwiserotatingarrowaroundaclock_79793.ICO')
+    history_window.iconbitmap('./counterclockwiserotatingarrowaroundaclock_79793.ICO')
 
     history_text = tk.Text(history_window, wrap=tk.WORD, font=('arial', 12), bg="#303030", fg="white")
     history_text.pack(expand=True, fill="both")
@@ -184,7 +184,7 @@ def cos(x):
             return 0
     return round(result, 6)
 
-def sen(x):
+def sin(x):
     result = math.sin((x * math.pi) / 180.0)
 
     if x % 90 == 0:
@@ -227,6 +227,8 @@ def plot_graph():
     try:
         # Obtenha a expressão atual do campo de entrada
         expression = input_text.get()
+        if (expression.count('(') - expression.count(')')) > 0: 
+            for i in range(expression.count('(') - expression.count(')')): expression = expression + ")"         
         
         # Crie uma expressão simbólica usando a biblioteca sympy
         x, y, z = symbols('x y z')  # Adicione z para gráficos 3D
@@ -235,7 +237,7 @@ def plot_graph():
         # Determine a dimensão da expressão
         if "y" in expression: dimension_count = 2
         else: dimension_count = 1
-        
+
         #Definição da fonte do título
         csfont = {'fontname':'Arial'}
 
@@ -380,6 +382,8 @@ def integrar_xy(self):
         self.entry.delete(0, tk.END)
         self.entry.insert(tk.END, "Erro")
 
+#Criação da animação de cores ao passar o mouse em cima dos botões
+
 def on_enter_symbols(e):
     e.widget['background'] = "#505050"
 
@@ -399,14 +403,15 @@ def on_leave_equal(e):
     e.widget['background'] = "#FF686B"
 
 def on_enter_history_btn(e):
-    e.widget['background'] = "#DA6D00"
+    e.widget['background'] = "#D77C00"
 
 def on_leave_history_btn(e):
-    e.widget['background'] = "#FF8000"
+    e.widget['background'] = "#FF9300"
 
+#Função para que se possa escrever a expressão utilizando as teclas do teclado ao invés dos botões da calculadora
 def on_key_press(event):
     key = event.char
-    if key in "0123456789":
+    if key in list_of_constants:
         try:
             btn_click(int(key))
         except ValueError: pass
@@ -434,6 +439,8 @@ def on_key_press(event):
         btn_click("(")
     elif key == ")":
         btn_click(")")
+    elif key in "abcdefghijklmnopqrstuvwxz":
+        btn_click(key)
     elif key == "\r":
         bt_equal()
     elif event.keysym == "BackSpace":
@@ -445,7 +452,9 @@ expression = ""
 error = 0
 input_text = tk.StringVar()
 input_text.set("0")
- 
+
+#Criação da janela ao qual a parte principal da calculadora ficará 
+
 input_frame = tk.Frame(win, width=12, height=50, bd=0, highlightbackground="black", highlightcolor="black", highlightthickness=0)
  
 input_frame.pack(side=tk.TOP)
@@ -460,9 +469,11 @@ btns_frame = tk.Frame(win, width=312, height=272.5, bg="#303030")
 
 btns_frame.pack()
 
+#Abaixo, estão os botões que fazem parte da calculadora
+
 #primeira linha
 
-history_button = tk.Button(win, text="Histórico", fg="white", activebackground="#FF8000", activeforeground="#DEDEDE", font=('arial', 14, 'bold'), width=12, height=2, bd=0, bg="#FF8000", cursor="arrow", command=show_history)
+history_button = tk.Button(win, text="Histórico", fg="#303030", activebackground="#FF9300", activeforeground="#404040", font=('arial', 14, 'bold'), width=12, height=2, bd=0, bg="#FF9300", cursor="arrow", command=show_history)
 history_button.place(x=4, y=4)
 history_button.bind("<Enter>", on_enter_history_btn) 
 history_button.bind("<Leave>", on_leave_history_btn)
@@ -551,7 +562,7 @@ minus.grid(row = 2, column = 3, padx = 1, pady = 1, sticky="NSEW")
 minus.bind("<Enter>", on_enter_symbols) 
 minus.bind("<Leave>", on_leave_symbols)
 
-sine = tk.Button(btns_frame, text = "sen", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_click("sen("))
+sine = tk.Button(btns_frame, text = "sen", fg = "white", activebackground="#404040", activeforeground="#909090", font=('arial', 14), width = 6, height = 2, bd = 0, bg = "#404040", cursor = "arrow", command = lambda: btn_click("sin("))
 sine.grid(row = 2, column = 4, padx = 1, pady = 1, sticky="NSEW")
 sine.bind("<Enter>", on_enter_symbols) 
 sine.bind("<Leave>", on_leave_symbols)
